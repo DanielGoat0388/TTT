@@ -30,9 +30,7 @@ cube diag2: [5,5,-5] start 1 grid top right
 cube diag3: [5,-5,5] start 1 grid bottom left
 cube diag4: [5,-5,-5] start 1 grid bottom right
 """
-
 #    ***coordinates are minus 1 since indices start at 0
-
 """
 
 all functions all return a list in the form
