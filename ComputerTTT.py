@@ -1,7 +1,6 @@
 #Computer ttt
 import tictactoe as ttt
 import CheckWinTTT as win
-
 import random as ran
 import itertools
 
