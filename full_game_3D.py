@@ -103,7 +103,7 @@ I.e 1,1,1 would be the left uppermost move""")
     allplayer1moves = [] #for memory
     allplayer2moves= [] #for memory 
     while True:
-        bot_move = bot.bot_decide_move(grid,bot_symbol)
+        bot_move = bot.bot_decide_move(grid,bot_symbol,player_symbol)
           
         allplayer2moves.append(bot_move)
         grid =ttt.mark(grid,bot_symbol,bot_move)
@@ -231,10 +231,10 @@ def play_again():
             ttt.play_multiplayer_game()
         elif choice == 'b':
             choice2 = input("Press 'a' to move first or 'b' to move second (default you move first): ")
-            if choice2 =='b':
-                single_player_play_game()
-            else: 
+            if choice2 =='b': 
                 single_player_bot_move_first_play_game2()
+            else:
+                single_player_play_game()
         elif choice == 'c':
             spectate_bots()
         else:
