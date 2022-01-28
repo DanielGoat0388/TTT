@@ -257,5 +257,3 @@ def check_all_wins(grid,symbol):
     else:
         return False
 
-#toe.printGrid(example18)
-#print(check_all_wins(example18,'x'))
