@@ -153,7 +153,7 @@ I.e 1,1,1 would be the left uppermost move""")
 
 def spectate_bots():
     grid  = [[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']]]
-    ttt.printGrid(grid) #initial board
+    #ttt.printGrid(grid) #initial board
     all_bot_1_moves = [] #for memory
     all_bot_2_moves= [] #for memory
 

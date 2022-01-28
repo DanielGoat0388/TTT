@@ -4,11 +4,12 @@ import check_win_3D as tic
 """
 example 4 by 4 by 4 grid
 
- _______________
-|___|___|___|___|
-|___|___|_o_|___|
-|___|_x_|___|___|
-|___|___|___|___|
+          z1  z2  z3  z4
+x1        _______________
+    y1   |___|___|___|___|
+    y2   |___|___|_o_|___|
+    y3   |___|_x_|___|___|
+    y4   |___|___|___|___|
 
  _______________
 |___|___|___|___|
@@ -37,21 +38,26 @@ first sublist is plane, second is row, elements are columns
 
 """
 
-def printPlane(PlaneList):
-    print('         _______________')
+def printPlane(PlaneList,count):
+    print('          z1  z2  z3  z4')
+    print('x' + str(count) + str('        _______________')) 
+    rowcount=0  
     for row in PlaneList:
-        rowstring='        |_'
+        rowcount+=1
+        rowstring=('    y' + str(rowcount) + str('   |_'))
         for element in row:
             if element!='':
                 rowstring+=str(element) + '_|_'
             else:
                 rowstring+='__|_'
-        rowstring = rowstring[0:25]
+        rowstring = rowstring[0:26]
         print(rowstring)
 
 def printGrid(GridList):
+    xcount=0
     for plane in GridList:
-        printPlane(plane)
+        xcount+=1
+        printPlane(plane,xcount)
         print("")
 
 def mark(grid,symbol,coordinates):
@@ -206,6 +212,4 @@ I.e 1,1,1 would be the left uppermost move""")
             #print(allplayer2moves)
                 printGrid(grid) #show new grid after going back moves
  
-
-
-
+#printGrid([[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']]])
