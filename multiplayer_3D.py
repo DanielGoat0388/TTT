@@ -66,8 +66,12 @@ def mark(grid,symbol,coordinates):
     #coordinates in [x,y,z] format
     #where x is plane from top to bottom, y is row from top to bottom and z is column from left to right
     #starting with 1
-    x,y,z = coordinates[0] -1 ,coordinates[1]-1 ,coordinates[2]-1 
-    grid[x][y][z] = symbol
+    try:
+        x,y,z = coordinates[0] -1 ,coordinates[1]-1 ,coordinates[2]-1 
+        grid[x][y][z] = symbol
+    except IndexError: #subtract again
+        x,y,z = coordinates[0] -2,coordinates[1]-2 ,coordinates[2]-2 
+        grid[x][y][z] = symbol
         
     return grid
 
@@ -79,18 +83,32 @@ def checkinteger(x): #check integer x, if int, return true
         return False
 
 def checkMoveNotTake(grid,coordinates): #check if move is taken, true if possible to play on
-    x,y,z = coordinates[0] -1 ,coordinates[1]-1 ,coordinates[2]-1 
-    if grid[x][y][z]!='':
-        return False
-    else:
-        return True
+    try:
+        x,y,z = coordinates[0] -1 ,coordinates[1]-1 ,coordinates[2]-1 
+        if grid[x][y][z]!='':
+            return False
+        else:
+            return True
+    except IndexError:
+        x,y,z = coordinates[0] -2 ,coordinates[1]-2 ,coordinates[2]-2
+        if grid[x][y][z]!='':
+            return False
+        else:
+            return True
 
 def check_move_not_take2(grid,coordinates): #coordinates from 0-3
-    x,y,z = coordinates[0] ,coordinates[1] ,coordinates[2]
-    if grid[x][y][z]!='':
-        return False
-    else:
-        return True
+    try:
+        x,y,z = coordinates[0] ,coordinates[1] ,coordinates[2]
+        if grid[x][y][z]!='':
+            return False
+        else:
+            return True
+    except IndexError:
+        x,y,z = coordinates[0] -1 ,coordinates[1]-1 ,coordinates[2]-1
+        if grid[x][y][z]!='':
+            return False
+        else:
+            return True
 
 def getCoordinates(grid): #grid data needed to know if move has been taken
     while True:
@@ -212,4 +230,3 @@ I.e 1,1,1 would be the left uppermost move""")
             #print(allplayer2moves)
                 printGrid(grid) #show new grid after going back moves
  
-#printGrid([[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']]])

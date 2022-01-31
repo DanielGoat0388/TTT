@@ -24,6 +24,7 @@ def check_poi(line1_,line2_): #checks if lines intersect, if they do, returns tr
         for coordinate2 in line2:
             if coordinate[1] == coordinate2[1]:
                 POI_boo = True
+                #print("POI between " , line1 , ' and ' , line2 , ' is: ', coordinate[1])
                 POI = coordinate[1]
     return [POI_boo,POI]
 
@@ -48,12 +49,9 @@ def possible_win_line(line_): #check if it is possible to win on this line, retu
     del line[0]
 
     for coordinate in line:
-        #print(coordinate[1])
         if coordinate[0]==1:
             player=True
-            #print("player move ")
         elif coordinate[0]== -1:
-            #print("opponent move")
             opponent=True
     if player and opponent: #if both players on it, impossible to win
         win=False
@@ -63,7 +61,8 @@ def compare_list_of_lines(grid,set_of_lines): #check poi for a list of lines
     """
     grid needed to know if poi is taken
     return [boo,coordinate]
-    true if intersect, false if not
+    return true if intersect and not taken, coordinate, 
+    else return false,''
     """
     threat_poi=[False,''] 
 
@@ -76,6 +75,23 @@ def compare_list_of_lines(grid,set_of_lines): #check poi for a list of lines
             threat_poi[1] = test_POI[1]
 
     return threat_poi         
+
+def compare_one_line_with_list_of_lines(grid,set_of_lines,line):
+    """
+    check one line with a set of lines
+    grid data needed to know if poi is taken
+    return [boo,coordinate]
+    return true if intersect and not taken, coordinate, 
+    else return false,''
+    """
+    poi = [False, '','']
+    for line_ in set_of_lines:
+        test_poi = check_poi(line,line_)
+        if test_poi[0] and ttt.check_move_not_take2(grid,test_poi[1]): #lines intersect, poit avail
+            poi[0] = test_poi[0]
+            poi[1] = test_poi[1]
+            poi[2] = line_ #line in set that intersects
+    return poi
 
 def check_2_in_line_poi_threat(grid,cube_data): #check if opponent might win using 2 lines that intersect 
     """
@@ -607,6 +623,16 @@ def empty_move(line_): #the empty move in a line
         if coordinate[0] != 1: #not already the bot's move
             return coordinate[1]
 
+def empty_move2(line_,coordinate_): 
+    """
+    return empty move that is NOT given coordinate
+    """
+    line=line_[:]
+    del line[0]
+    for coordinate in line:
+        if coordinate[0] != 1 and coordinate[0]!=coordinate_: #not already the bot's move, not given coordinate
+            return coordinate[1]
+
 def check_easy_win_cube(cube_data): #if there is 3 in a row, win
     """
     return true if 3 in row, and easy win
@@ -639,11 +665,86 @@ def check_bot_2_in_row(cube_data): #threaten to win
                 coordinate = empty_move(line)
     return [two_in_line,coordinate]
 
+def only_1_in_line(cube_data):
+    one_in_line = False
+    coordinate= ''
+    for group in cube_data:
+        for line in group:
+            count = count_moves_on_line(line)
+            if count[0]==1 and count[1]==0: #bot has 2, opponent/player has none therefore two empty
+                one_in_line = True
+                coordinate = empty_move(line)
+    return [one_in_line,coordinate]
+
+def bot_threaten_2_lines_poi(grid,cube_data): #check if bot can threat two wins
+    """
+    return true if bot has 2 lines that have 2 moves and intersect at poi that is not taken
+    else, return false and ''
+    [boo,coordinate]
+    """
+    #recall cube_data is taken in bot's perspective, where 1 is bot and -1 is opponent (player)
+    bot_threat = False
+    coordinate = ''
+
+    bot_lines = []
+    for group in cube_data: #group of lines
+        for line in group: #each line in that group
+            count = count_moves_on_line(line)
+            if count[0]==2 and count[1]==0: #bot has 2 on this line and opponent has none
+                bot_lines.append(line)
+
+    poi_boo_coordinate = compare_list_of_lines(grid,bot_lines) 
+    if poi_boo_coordinate[0]:
+        bot_threat = True
+        coordinate = poi_boo_coordinate[1]
+    return [bot_threat,coordinate]
+
+def bot_set_up_2_lines(grid,cube_data):
+    """
+    return [boo,coordinate]
+    return true if can set up 2 lines and coordinate
+    else false, ''
+    """
+    set_up = False
+    coordinate = ''
+    bot_lines_with_2 = []
+    bot_lines_with_1 = []
+    #collect lines with 2 moves on them
+    for group in cube_data: #group of lines
+        for line in group: #each line in that group
+            count = count_moves_on_line(line)
+            if count[0]==2 and count[1]==0: #bot has 2 on this line and opponent has none
+                bot_lines_with_2.append(line)
+
+    #collect lines with 1 moves on them
+    for group in cube_data: #group of lines
+        for line in group: #each line in that group
+            count = count_moves_on_line(line)
+            if count[0]==1 and count[1]==0: #bot has 1 on this line and opponent has none
+                bot_lines_with_1.append(line)
+
+    for line_with_1 in bot_lines_with_1: #compare each line (with 1) from list to every line (with 2) in other list
+        poi_boo_coordinate = compare_one_line_with_list_of_lines(grid,bot_lines_with_2,line_with_1) 
+        if poi_boo_coordinate[0]: #lines intersect and poi availible
+            set_up = True
+            
+            #print("set up line with 1 " , line_with_1)
+            #print("set up line with 2 " , poi_boo_coordinate[2])
+            #print("lines intersect at " , poi_boo_coordinate[1])
+            
+            coordinate = empty_move2(line_with_1,poi_boo_coordinate[1])
+
+            #print("the move that is on the line with 1 and IS NOT poi: " , coordinate)
+
+            if set_up: #first set of intersecting lines
+                break
+    
+    return [set_up,coordinate]
+
 
 #______________________________________________________________________________________
 
 def change_coordinates(coordinates): #change coordinates from real indices to coordinates
-    #print("coordinates " , coordinates)
     for x in range(3):
         coordinates[x]+=1
     return coordinates
@@ -653,42 +754,56 @@ def bot_decide_move(grid,bot_symbol,opponent_symbol):
     """
     return best bot_move"""
     cube_data = cube.get_cube_data(grid,bot_symbol) #collect data for lines
-        #read_cube_data(cube_data)
+
+    threat3 = check_all_plane_threats(grid,opponent_symbol) #center of plane 
+    if threat3[0]:#also potentional threat
+        print(bot_symbol, " moved to block plane")
+        bot_move = change_coordinates(threat3[1])
 
     threat2 = check_2_in_line_poi_threat(grid,cube_data) #poi 2 lines
     if threat2[0]: #there is a potential threat
+        print(bot_symbol, " moved to block poi")
         bot_move = change_coordinates(threat2[1])
     
-    threat3 = check_all_plane_threats(grid,opponent_symbol) #center of plane 
-    if threat3[0]:#also potentional threat
-        bot_move = change_coordinates(threat3[1])
 
     threat1 = check_3_in_row_threat(cube_data) #3 in a row
     if threat1[0]: #there is immediate threat
+        print(bot_symbol , " bot moved to immediate block")
         bot_move = threat1[1] #this is the coordinate
-                #element+=1#now coordinates should be 1-4
         bot_move = change_coordinates(bot_move)
-            #print(bot_move)
 
     if not threat1[0] and not threat2[0] and not threat3[0]: #there are no threats
-        bot_2_in_line = check_bot_2_in_row(cube_data) #check if 2 in a line 
-        if bot_2_in_line[0]: #move to threaten player
-            #print(bot_symbol , " moved to threat")
-            bot_move = change_coordinates(bot_2_in_line[1])
-
-
-        else:
-            while True:
+        while True: #no threats, play random
                 bot_move = [ran.randint(1,4),ran.randint(1,4),ran.randint(1,4)]
                 if ttt.checkMoveNotTake(grid,bot_move):
                     print(bot_symbol , " moved random ")
                     break
         
-    easy_3_in_row = check_easy_win_cube(cube_data)
+        one_in_line = only_1_in_line(cube_data)
+        if one_in_line[0]:
+            print(bot_symbol , " bot moved to get 2 in line")
+            bot_move = change_coordinates(one_in_line[1])
+
+        bot_2_in_line = check_bot_2_in_row(cube_data) #check if 2 in a line, we can threaten
+        if bot_2_in_line[0]: #move to threaten player
+            print(bot_symbol , " moved to immediate threat")
+            bot_move = change_coordinates(bot_2_in_line[1])
+
+        bot_set_up = bot_set_up_2_lines(grid,cube_data) #even better, set up to threaten in two ways
+        if bot_set_up[0]: 
+            print(bot_symbol , " moved to set up")
+            #print("bot move before change: " , bot_move)
+            bot_move = change_coordinates(bot_set_up[1])
+
+        bot_threat_2_lines = bot_threaten_2_lines_poi(grid,cube_data)
+        if bot_threat_2_lines[0]: #even better, bot can already threaten 2 ways by moving to poi
+            print(bot_symbol , " bot moved to threaten two ways ")
+            bot_move = change_coordinates(bot_threat_2_lines[1]) 
+        
+
+    easy_3_in_row = check_easy_win_cube(cube_data) #all of that doesnt matter if bot can just win
     if easy_3_in_row[0]: #bot can win, this move takes highest precendence
         bot_move = change_coordinates(easy_3_in_row[1])
         print(bot_symbol , " moved to win")
-        
+    
     return bot_move
-
-
