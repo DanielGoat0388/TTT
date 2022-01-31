@@ -2,7 +2,16 @@
 import multiplayer_3D as ttt
 import check_win_3D as win
 import bot_strategies_and_code_3D as bot
+import matplotlib.pyplot as plt
 
+def graph_bot_data(data):
+    win_tie = ['Bot 1 Wins','Bot 2 wins','Tied']
+
+    plt.bar(win_tie, data)
+    plt.title('Game result')
+    plt.xlabel('Game result ')
+    plt.ylabel('Number of games')
+    plt.show()
 
 def single_player_play_game():
     grid  = [[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']]]
@@ -302,8 +311,8 @@ def collect_data(number_of_games):
             grid =ttt.mark(grid,bot_1_symbol,bot_move)
 
             if win.check_all_wins(grid,bot_1_symbol): #bot 1 win?
-                ttt.printGrid(grid)
-                print("Bot 1 moved: " + str(bot_move))
+                #ttt.printGrid(grid)
+                #print("Bot 1 moved: " + str(bot_move))
                 print("Bot 1 wins! ")
                 bot_1_wins +=1
                 break
@@ -314,7 +323,7 @@ def collect_data(number_of_games):
 
             all_bot_2_moves.append(bot_2_move)
             grid =ttt.mark(grid,bot_2_symbol,bot_2_move)
-            ttt.printGrid(grid) #show grid
+            #ttt.printGrid(grid) #show grid
 
             if win.check_all_wins(grid,bot_2_symbol): #bot 2 win?
                 #ttt.printGrid(grid)
@@ -323,8 +332,8 @@ def collect_data(number_of_games):
                 break
     #___________________________________________________________________________________
             
-            print("Bot 1 moved: " + str(bot_move))
-            print("Bot 2 moved: " + str(bot_2_move))
+            #print("Bot 1 moved: " + str(bot_move))
+            #print("Bot 2 moved: " + str(bot_2_move))
 
 
             if ttt.check_tied_game(grid):
@@ -349,7 +358,7 @@ def play_again():
                 spectate_one_bot()
             elif choice2 == 'd': #collect data
                 games_data = collect_data(int(input("Enter number of games: ")))
-                print(games_data)
+                graph_bot_data(games_data)
             else:
                 single_player_play_game()
         elif choice == 'c':
