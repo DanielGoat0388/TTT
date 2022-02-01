@@ -135,12 +135,11 @@ def check_column_plane_column(grid,symbol):
 
 def check_column_plane_diag(grid,symbol):
     win =False
-    rowcount =[] #ensure rows are ascending order
-    rowcount2 = [] #for inverse diagonal where x+y ==3
 
     #first is to check 'true' diagonal
     for z in range(4): #iterate through columns
         diagcount=0
+        rowcount =[] #ensure rows are ascending order
         for x in range(4): #iterate through grids
             for y in range(4): #iterate through rows
                 if grid[x][y][z]==symbol and (x==y ):# or x+y==3):
@@ -158,6 +157,7 @@ def check_column_plane_diag(grid,symbol):
     #now check inverse diagonal
     for z in range(4): #iterate through columns
         diagcount=0
+        rowcount2 = [] #for inverse diagonal where x+y ==3
         for x in range(4): #iterate through grids
             for y in range(4): #iterate through rows
                 if grid[x][y][z]==symbol and (x+y==3):
@@ -178,12 +178,10 @@ def check_column_plane_diag(grid,symbol):
 
 def check_row_plane_diag(grid,symbol):
     win = False
-    columncount=[]
-    columncount2 = []
-
     #true diagonal
     for y in range(4): #iterate through rows
         diagcount=0
+        columncount=[]
         for x in range(4): #iterate through grids
             for z in range(4): #iterate through columns
                 if grid[x][y][z]==symbol and (x==z): # or x+z==3):
@@ -197,6 +195,7 @@ def check_row_plane_diag(grid,symbol):
     #inverse diagonal
     for y in range(4): #iterate through rows
         diagcount=0
+        columncount2 = []
         for x in range(4): #iterate through grids
             for z in range(4): #iterate through columns
                 if grid[x][y][z]==symbol and x+z==3:
@@ -204,7 +203,6 @@ def check_row_plane_diag(grid,symbol):
                     columncount2.append(z)
                     if diagcount==4 and sum_list(columncount2)==6:
                         win = True
-                        print("column count2 " + str(columncount2))
                         print("way 6.1")
         
     return win 
