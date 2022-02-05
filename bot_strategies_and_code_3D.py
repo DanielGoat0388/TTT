@@ -699,7 +699,7 @@ def bot_threaten_2_lines_poi(grid,cube_data): #check if bot can threat two wins
         coordinate = poi_boo_coordinate[1]
     return [bot_threat,coordinate]
 
-def bot_set_up_2_lines(grid,cube_data):
+def bot_set_up_2_lines(grid,cube_data,debug=False):
     """
     return [boo,coordinate]
     return true if can set up 2 lines and coordinate
@@ -728,13 +728,14 @@ def bot_set_up_2_lines(grid,cube_data):
         if poi_boo_coordinate[0]: #lines intersect and poi availible
             set_up = True
             
-            #print("set up line with 1 " , line_with_1)
-            #print("set up line with 2 " , poi_boo_coordinate[2])
-            #print("lines intersect at " , poi_boo_coordinate[1])
+            if debug:
+                print("set up line with 1 " , line_with_1)
+                print("set up line with 2 " , poi_boo_coordinate[2])
+                print("lines intersect at " , poi_boo_coordinate[1])
             
             coordinate = empty_move2(line_with_1,poi_boo_coordinate[1])
-
-            #print("the move that is on the line with 1 and IS NOT poi: " , coordinate)
+            if debug:
+                print("the move that is on the line with 1 and IS NOT poi: " , coordinate)
 
             if set_up: #first set of intersecting lines
                 break

@@ -3,6 +3,7 @@ import multiplayer_3D as ttt
 import check_win_3D as win
 import bot_strategies_and_code_3D as bot
 import matplotlib.pyplot as plt
+#import bot_insults as BI
 
 def graph_bot_data(data):
     win_tie = ['Bot 1 Wins','Bot 2 wins','Tied']
@@ -56,7 +57,6 @@ I.e 1,1,1 would be the left uppermost move""")
         allplayer2moves.append(bot_move)
         grid =ttt.mark(grid,bot_symbol,bot_move)
         ttt.printGrid(grid) #show grid
-
 
         print("Bot moved: " + str(bot_move))
 
@@ -289,6 +289,82 @@ def spectate_one_bot(): #used for debugging/analysis
             print("Game tied! ")
             break
 
+def mean_bot_game():
+    grid  = [[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']]]
+    print("Welcome to single player 3D tic tac toe against MEAN bot")
+    print("Please chose symbol first")
+    player_symbol = ttt.getSymbol()
+    print("Chose symbol for meany bot ")
+    while True: #loop in case same symbol
+        bot_symbol = ttt.getSymbol()
+        if player_symbol==bot_symbol:
+            print("Bot symbol cannot be the same as yours")
+        else:
+            break
+    print("")
+    print("""Instructions
+Moves are determined by coordinates in the form 'x,y,z' 
+The first cooridinate is the plane from top to bottom
+The second coordinate is the row from top to bottom
+The third coordinate is the column from left to right
+I.e 1,1,1 would be the left uppermost move""")
+
+
+    ttt.printGrid(grid) #initial board
+    allplayer1moves = [] #for memory
+    allplayer2moves= [] #for memory 
+    while True:
+
+        print("Player:")
+        player1move=ttt.getCoordinates(grid) #get coordinates
+        allplayer1moves.append(player1move) #store move in list
+        grid = ttt.mark(grid,player_symbol,player1move) #implement the move
+        #ttt.printGrid(grid) #show grid 
+
+        if win.check_all_wins(grid,player_symbol):
+            ttt.printGrid(grid)
+            print("Player wins! Good job I guess")
+            #print(grid)
+            break
+        
+        bot_move = bot.bot_decide_move(grid,bot_symbol,player_symbol)
+
+        allplayer2moves.append(bot_move)
+        grid =ttt.mark(grid,bot_symbol,bot_move)
+        ttt.printGrid(grid) #show grid
+
+        insult  = BI.chose_insult()
+        print(insult)
+
+        if win.check_all_wins(grid,bot_symbol): #bot win?
+            #ttt.printGrid(grid)
+            print("Bot wins! You actually are trash, in fact ")
+            break
+
+        if ttt.check_tied_game(grid):
+            print("Game tied! I guess you're good")
+            break
+
+        choice = input("Press 'q' to quit or 'b' to undo ") #choice to end or undo
+        if  choice == 'q': #end game
+            print("Game ended")
+            print(grid)
+            break
+
+        if choice == 'b': #go back
+            goBack = int(input("Enter number of times to go back "))
+            if goBack>len(allplayer2moves): #cant go back that many moves
+                print('Invalid choice, keep playing')
+            else: 
+                for x in range(goBack): #make the last move empty
+                    grid = ttt.mark(grid,'',allplayer1moves[-1]) 
+                    grid = ttt.mark(grid,'',allplayer2moves[-1])
+                    allplayer1moves.pop() #then delete the move from the memory 
+                    allplayer2moves.pop()
+            #print(allplayer1moves)
+            #print(allplayer2moves)
+                ttt.printGrid(grid) #show new grid after going back moves
+    
 def collect_data(number_of_games):
     bot_1_wins = 0
     bot_2_wins = 0
@@ -359,6 +435,8 @@ def play_again():
             elif choice2 == 'd': #collect data
                 games_data = collect_data(int(input("Enter number of games: ")))
                 graph_bot_data(games_data)
+            elif choice2 == 'm':# meany bot
+                mean_bot_game()
             else:
                 single_player_play_game()
         elif choice == 'c':
