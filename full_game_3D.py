@@ -20,12 +20,14 @@ def single_player_play_game():
     print("Please chose symbol first")
     player_symbol = ttt.getSymbol()
     print("Chose symbol for bot ")
-    while True: #loop in case same symbol
+
+    symbol_loop = True
+    while symbol_loop: #loop in case same symbol
         bot_symbol = ttt.getSymbol()
         if player_symbol==bot_symbol:
             print("Bot symbol cannot be the same as yours")
         else:
-            break
+            symbol_loop = False
     print("")
     print("""Instructions
 Moves are determined by coordinates in the form 'x,y,z' 
@@ -38,7 +40,8 @@ I.e 1,1,1 would be the left uppermost move""")
     ttt.printGrid(grid) #initial board
     allplayer1moves = [] #for memory
     allplayer2moves= [] #for memory 
-    while True:
+    game_loop = True
+    while game_loop:
 
         print("Player:")
         player1move=ttt.getCoordinates(grid) #get coordinates
@@ -50,44 +53,47 @@ I.e 1,1,1 would be the left uppermost move""")
             ttt.printGrid(grid)
             print("Player wins! ")
             #print(grid)
-            break
+            game_loop = False
         
-        bot_move = bot.bot_decide_move(grid,bot_symbol,player_symbol)
-    
-        allplayer2moves.append(bot_move)
-        grid =ttt.mark(grid,bot_symbol,bot_move)
-        ttt.printGrid(grid) #show grid
+        if game_loop:
+            bot_move = bot.bot_decide_move(grid,bot_symbol,player_symbol)
+        
+            allplayer2moves.append(bot_move)
+            grid =ttt.mark(grid,bot_symbol,bot_move)
+            ttt.printGrid(grid) #show grid
 
-        print("Bot moved: " + str(bot_move))
+            print("Bot moved: " + str(bot_move))
 
-        if win.check_all_wins(grid,bot_symbol): #bot win?
-            #ttt.printGrid(grid)
-            print("Bot wins! ")
-            break
+            if win.check_all_wins(grid,bot_symbol): #bot win?
+                #ttt.printGrid(grid)
+                print("Bot wins! ")
+                game_loop = False
 
-        if ttt.check_tied_game(grid):
-            print("Game tied! ")
-            break
+            if game_loop:
+                if ttt.check_tied_game(grid):
+                    print("Game tied! ")
+                    game_loop = False
 
-        choice = input("Press 'q' to quit or 'b' to undo ") #choice to end or undo
-        if  choice == 'q': #end game
-            print("Game ended")
-            print(grid)
-            break
+                if game_loop:
+                    choice = input("Press 'q' to quit or 'b' to undo ") #choice to end or undo
+                    if  choice == 'q': #end game
+                        print("Game ended")
+                        print(grid)
+                        game_loop = False
 
-        if choice == 'b': #go back
-            goBack = int(input("Enter number of times to go back "))
-            if goBack>len(allplayer2moves): #cant go back that many moves
-                print('Invalid choice, keep playing')
-            else: 
-                for x in range(goBack): #make the last move empty
-                    grid = ttt.mark(grid,'',allplayer1moves[-1]) 
-                    grid = ttt.mark(grid,'',allplayer2moves[-1])
-                    allplayer1moves.pop() #then delete the move from the memory 
-                    allplayer2moves.pop()
-            #print(allplayer1moves)
-            #print(allplayer2moves)
-                ttt.printGrid(grid) #show new grid after going back moves
+                    if choice == 'b': #go back
+                        goBack = int(input("Enter number of times to go back "))
+                        if goBack>len(allplayer2moves): #cant go back that many moves
+                            print('Invalid choice, keep playing')
+                        else: 
+                            for x in range(goBack): #make the last move empty
+                                grid = ttt.mark(grid,'',allplayer1moves[-1]) 
+                                grid = ttt.mark(grid,'',allplayer2moves[-1])
+                                allplayer1moves.pop() #then delete the move from the memory 
+                                allplayer2moves.pop()
+                        #print(allplayer1moves)
+                        #print(allplayer2moves)
+                            ttt.printGrid(grid) #show new grid after going back moves
 
 def single_player_bot_move_first_play_game2():
     grid  = [[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']]]
@@ -95,12 +101,15 @@ def single_player_bot_move_first_play_game2():
     print("Please chose symbol first")
     player_symbol = ttt.getSymbol()
     print("Chose symbol for bot ")
-    while True: #loop in case same symbol
+
+    symbol_loop = True
+    while symbol_loop: #loop in case same symbol
         bot_symbol = ttt.getSymbol()
         if player_symbol==bot_symbol:
             print("Bot symbol cannot be the same as yours")
         else:
-            break
+            symbol_loop = False
+    
     print("")
     print("""Instructions
 Moves are determined by coordinates in the form 'x,y,z' 
@@ -113,9 +122,10 @@ I.e 1,1,1 would be the left uppermost move""")
     #ttt.printGrid(grid) #initial board
     allplayer1moves = [] #for memory
     allplayer2moves= [] #for memory 
-    while True:
+    game_loop = True
+    while game_loop:
         bot_move = bot.bot_decide_move(grid,bot_symbol,player_symbol)
-          
+
         allplayer2moves.append(bot_move)
         grid =ttt.mark(grid,bot_symbol,bot_move)
         ttt.printGrid(grid) #show grid
@@ -124,43 +134,46 @@ I.e 1,1,1 would be the left uppermost move""")
         if win.check_all_wins(grid,bot_symbol): #bot win?
             #ttt.printGrid(grid)
             print("Bot wins! ")
-            break
-
-        print("Player:")
-        player1move=ttt.getCoordinates(grid) #get coordinates
-        allplayer1moves.append(player1move) #store move in list
-        grid = ttt.mark(grid,player_symbol,player1move) #implement the move
-        #ttt.printGrid(grid) #show grid 
-
-        if win.check_all_wins(grid,player_symbol):
-            ttt.printGrid(grid)
-            print("Player wins! ")
-            #print(grid)
-            break
-
-        if ttt.check_tied_game(grid):
-            print("Game tied! ")
-            break
+            game_loop = False
         
-        choice = input("Press 'q' to quit or 'b' to undo ") #choice to end or undo
-        if  choice == 'q': #end game
-            print("Game ended")
-            #print(grid)
-            break
+        if game_loop:
+            print("Player:")
+            player1move=ttt.getCoordinates(grid) #get coordinates
+            allplayer1moves.append(player1move) #store move in list
+            grid = ttt.mark(grid,player_symbol,player1move) #implement the move
+            #ttt.printGrid(grid) #show grid 
 
-        if choice == 'b': #go back
-            goBack = int(input("Enter number of times to go back "))
-            if goBack>len(allplayer2moves): #cant go back that many moves
-                print('Invalid choice, keep playing')
-            else: 
-                for x in range(goBack): #make the last move empty
-                    grid = ttt.mark(grid,'',allplayer1moves[-1]) 
-                    grid = ttt.mark(grid,'',allplayer2moves[-1])
-                    allplayer1moves.pop() #then delete the move from the memory 
-                    allplayer2moves.pop()
-            #print(allplayer1moves)
-            #print(allplayer2moves)
-                ttt.printGrid(grid) #show new grid after going back moves
+            if win.check_all_wins(grid,player_symbol):
+                ttt.printGrid(grid)
+                print("Player wins! ")
+                #print(grid)
+                game_loop = False
+
+            if game_loop:
+                if ttt.check_tied_game(grid):
+                    print("Game tied! ")
+                    game_loop = False
+                
+                if game_loop:
+                    choice = input("Press 'q' to quit or 'b' to undo ") #choice to end or undo
+                    if  choice == 'q': #end game
+                        print("Game ended")
+                        #print(grid)
+                        game_loop = False
+
+                    if choice == 'b': #go back
+                        goBack = int(input("Enter number of times to go back "))
+                        if goBack>len(allplayer2moves): #cant go back that many moves
+                            print('Invalid choice, keep playing')
+                        else: 
+                            for x in range(goBack): #make the last move empty
+                                grid = ttt.mark(grid,'',allplayer1moves[-1]) 
+                                grid = ttt.mark(grid,'',allplayer2moves[-1])
+                                allplayer1moves.pop() #then delete the move from the memory 
+                                allplayer2moves.pop()
+                        #print(allplayer1moves)
+                        #print(allplayer2moves)
+                            ttt.printGrid(grid) #show new grid after going back moves
     
 def spectate_bots():
     grid  = [[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']],[['','','',''],['','','',''],['','','',''],['','','','']]]
@@ -173,14 +186,16 @@ def spectate_bots():
     print("Please chose symbol for bot 1")
     bot_1_symbol = ttt.getSymbol()
     print("Chose symbol for bot 2")
-    while True: #loop in case same symbol
+    symbol_loop = True
+    while symbol_loop: #loop in case same symbol
         bot_2_symbol = ttt.getSymbol()
         if bot_1_symbol==bot_2_symbol:
             print("Bot 1 symbol cannot be the same as bot 2")
         else:
-            break
+            symbol_loop = False
     
-    while True: #game
+    game_loop = True
+    while game_loop: #game
         
         bot_move = bot.bot_decide_move(grid,bot_1_symbol,bot_2_symbol)
 
@@ -191,48 +206,50 @@ def spectate_bots():
             ttt.printGrid(grid)
             print("Bot 1 moved: " + str(bot_move))
             print("Bot 1 wins! ")
-            break
+            game_loop = False
 
 #REPEAT BUT FOR BOT 2 _______________________________________________________________
-        
-        bot_2_move = bot.bot_decide_move(grid,bot_2_symbol,bot_1_symbol)
+        if game_loop:
+            bot_2_move = bot.bot_decide_move(grid,bot_2_symbol,bot_1_symbol)
 
-        all_bot_2_moves.append(bot_2_move)
-        grid =ttt.mark(grid,bot_2_symbol,bot_2_move)
-        ttt.printGrid(grid) #show grid
+            all_bot_2_moves.append(bot_2_move)
+            grid =ttt.mark(grid,bot_2_symbol,bot_2_move)
+            ttt.printGrid(grid) #show grid
 
-        if win.check_all_wins(grid,bot_2_symbol): #bot 2 win?
-            #ttt.printGrid(grid)
-            print("Bot 2 wins! ")
-            break
-#___________________________________________________________________________________
-        
-        print("Bot 1 moved: " + str(bot_move))
-        print("Bot 2 moved: " + str(bot_2_move))
+            if win.check_all_wins(grid,bot_2_symbol): #bot 2 win?
+                #ttt.printGrid(grid)
+                print("Bot 2 wins! ")
+                game_loop = False
+    #___________________________________________________________________________________
+            if game_loop:
+                print("Bot 1 moved: " + str(bot_move))
+                print("Bot 2 moved: " + str(bot_2_move))
 
 
-        if ttt.check_tied_game(grid):
-            print("Game tied! ")
-            break
+                if ttt.check_tied_game(grid):
+                    print("Game tied! ")
+                    game_loop = False
 
-        choice = input("Press 'q' to quit or 'b' to undo ") #choice to end or undo
-        if  choice == 'q': #end game
-            print("Game ended")
-            #print(grid)
-            break
+                if game_loop:
+                    choice = input("Press 'q' to quit or 'b' to undo ") #choice to end or undo
+                    if  choice == 'q': #end game
+                        print("Game ended")
+                        #print(grid)
+                        game_loop = False
 
-        if choice == 'b': #go back
-            goBack = int(input("Enter number of times to go back "))
-            if goBack>len(all_bot_2_moves): #cant go back that many moves
-                print('Invalid choice, keep playing')
-            else: 
-                for x in range(goBack): #make the last move empty
-                    grid = ttt.mark(grid,'',all_bot_1_moves[-1]) 
-                    grid = ttt.mark(grid,'',all_bot_2_moves[-1])
-                    all_bot_1_moves.pop() #then delete the move from the memory 
-                    all_bot_2_moves.pop()
-                ttt.printGrid(grid) #show new grid after going back moves
+                    if choice == 'b': #go back
+                        goBack = int(input("Enter number of times to go back "))
+                        if goBack>len(all_bot_2_moves): #cant go back that many moves
+                            print('Invalid choice, keep playing')
+                        else: 
+                            for x in range(goBack): #make the last move empty
+                                grid = ttt.mark(grid,'',all_bot_1_moves[-1]) 
+                                grid = ttt.mark(grid,'',all_bot_2_moves[-1])
+                                all_bot_1_moves.pop() #then delete the move from the memory 
+                                all_bot_2_moves.pop()
+                            ttt.printGrid(grid) #show new grid after going back moves
 
+#______________still have to edit/take away break________________
 def spectate_one_bot(): #used for debugging/analysis
     #technically single player but be able to skip moves 
     #purpose is to analyze bot's moves without always having to play
@@ -418,10 +435,11 @@ def collect_data(number_of_games):
                 break
     
     return [bot_1_wins,bot_2_wins,tied_games]
-
+#_________________________________________________________________
 
 def play_again():
-    while True:
+    play=True
+    while play:
         skip = False
         choice= input("Press 'a' for multiplayer player, 'b' for single player, and 'c' for spectating bots: ")
         if choice == 'a':
@@ -445,7 +463,7 @@ def play_again():
             print("Please enter a choice")
             skip = True
         if not skip and input("Would you like to play again? (y/n) ")=='n':
-            break
+            play=False
 
 
 play_again()

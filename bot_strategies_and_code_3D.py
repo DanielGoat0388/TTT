@@ -723,22 +723,24 @@ def bot_set_up_2_lines(grid,cube_data,debug=False):
             if count[0]==1 and count[1]==0: #bot has 1 on this line and opponent has none
                 bot_lines_with_1.append(line)
 
-    for line_with_1 in bot_lines_with_1: #compare each line (with 1) from list to every line (with 2) in other list
-        poi_boo_coordinate = compare_one_line_with_list_of_lines(grid,bot_lines_with_2,line_with_1) 
-        if poi_boo_coordinate[0]: #lines intersect and poi availible
-            set_up = True
-            
-            if debug:
-                print("set up line with 1 " , line_with_1)
-                print("set up line with 2 " , poi_boo_coordinate[2])
-                print("lines intersect at " , poi_boo_coordinate[1])
-            
-            coordinate = empty_move2(line_with_1,poi_boo_coordinate[1])
-            if debug:
-                print("the move that is on the line with 1 and IS NOT poi: " , coordinate)
+    lines_found= False
+    if not lines_found:
+        for line_with_1 in bot_lines_with_1: #compare each line (with 1) from list to every line (with 2) in other list
+            poi_boo_coordinate = compare_one_line_with_list_of_lines(grid,bot_lines_with_2,line_with_1) 
+            if poi_boo_coordinate[0]: #lines intersect and poi availible
+                set_up = True
+                
+                if debug:
+                    print("set up line with 1 " , line_with_1)
+                    print("set up line with 2 " , poi_boo_coordinate[2])
+                    print("lines intersect at " , poi_boo_coordinate[1])
+                
+                coordinate = empty_move2(line_with_1,poi_boo_coordinate[1])
+                if debug:
+                    print("the move that is on the line with 1 and IS NOT poi: " , coordinate)
 
-            if set_up: #first set of intersecting lines
-                break
+                if set_up: #first set of intersecting lines
+                    lines_found = True
     
     return [set_up,coordinate]
 
@@ -774,11 +776,12 @@ def bot_decide_move(grid,bot_symbol,opponent_symbol):
         bot_move = change_coordinates(bot_move)
 
     if not threat1[0] and not threat2[0] and not threat3[0]: #there are no threats
-        while True: #no threats, play random
+        no_play = True
+        while no_play: #no threats, play random
                 bot_move = [ran.randint(1,4),ran.randint(1,4),ran.randint(1,4)]
                 if ttt.checkMoveNotTake(grid,bot_move):
                     print(bot_symbol , " moved random ")
-                    break
+                    no_play = False
         
         one_in_line = only_1_in_line(cube_data)
         if one_in_line[0]:

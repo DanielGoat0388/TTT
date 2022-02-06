@@ -111,7 +111,8 @@ def check_move_not_take2(grid,coordinates): #coordinates from 0-3
             return True
 
 def getCoordinates(grid): #grid data needed to know if move has been taken
-    while True:
+    get_cord_bool = True
+    while get_cord_bool:
         coordinateString = input("Enter coordinates in form 'x,y,z': ")
         if len(coordinateString)!=5: #check length for proper format
             print("Invalid format")
@@ -129,20 +130,21 @@ def getCoordinates(grid): #grid data needed to know if move has been taken
                             coordinateList.append(int(coordinateString[x]))
                     
             if valid==3 and checkMoveNotTake(grid,coordinateList): #must have THREE integer coordinates
-                break
+                get_cord_bool = False
             else:
                 print('Invalid move')
     return coordinateList
 
 def getSymbol():
-    while True:
+    get_symbol_loop=True
+    while get_symbol_loop:
         symbol = input("Enter symbol to use for the game: ")
         if len(symbol)!=1:
             print("Invalid format")
         else:
             print("Are you sure you want to use '" + symbol + "' as the symbol for the game?")
             if input("(y/n): ") == 'y':
-                break
+                get_symbol_loop = False
 
     return symbol
 
@@ -162,12 +164,14 @@ def play_multiplayer_game():
 Player one please enter symbol first""")
     player1symbol = getSymbol()
     print("Player two please enter symbol")
-    while True: #loop in case same symbol
+
+    symbol_loop=True
+    while symbol_loop: #loop in case same symbol
         player2symbol = getSymbol()
         if player1symbol==player2symbol:
             print("Symbol cannot be the same as player 1")
         else:
-            break
+            symbol_loop = False
 
     print("""
 Instructions
@@ -181,10 +185,10 @@ I.e 1,1,1 would be the left uppermost move""")
     printGrid(grid) #initial board
     allplayer1moves = [] #for memory
     allplayer2moves= [] #for memory 
-    while True:
 
-        newgrid=grid.copy()
-        j = newgrid.copy()
+    go = True
+    while go:
+
         
         print("Player 1:")
         player1move=getCoordinates(grid) #get coordinates
@@ -195,38 +199,41 @@ I.e 1,1,1 would be the left uppermost move""")
         if tic.check_all_wins(grid,player1symbol):
             print("Player 1 wins! ")
             #print(grid)
-            break
+            go = False
+        
+        if go:
+            print("Player 2: ")
+            player2move=getCoordinates(grid) #get coordinates
+            allplayer2moves.append(player2move) #store move in list
+            grid = mark(grid,player2symbol,player2move) #implement the move
+            printGrid(grid) #show grid
 
-        print("Player 2: ")
-        player2move=getCoordinates(grid) #get coordinates
-        allplayer2moves.append(player2move) #store move in list
-        grid = mark(grid,player2symbol,player2move) #implement the move
-        printGrid(grid) #show grid
+            if tic.check_all_wins(grid,player2symbol):
+                print("Player 2 wins! ")
+                go = False
 
-        if tic.check_all_wins(grid,player2symbol):
-            print("Player 2 wins! ")
-            break
-
-        #print(allplayer1moves)
-        #print(allplayer2moves)
-
-        choice = input("Press 'q' to quit or 'b' to undo ") #choice to end or undo
-        if  choice == 'q': #end game
-            print("Game ended")
-            #print(grid)
-            break
-
-        if choice == 'b': #go back
-            goBack = int(input("Enter number of times to go back "))
-            if goBack>len(allplayer2moves): #cant go back that many moves
-                print('Invalid choice, keep playing')
-            else: 
-                for x in range(goBack): #make the last move empty
-                    grid = mark(grid,'',allplayer1moves[-1]) 
-                    grid = mark(grid,'',allplayer2moves[-1])
-                    allplayer1moves.pop() #then delete the move from the memory 
-                    allplayer2moves.pop()
             #print(allplayer1moves)
             #print(allplayer2moves)
-                printGrid(grid) #show new grid after going back moves
+
+            if go:
+                choice = input("Press 'q' to quit or 'b' to undo ") #choice to end or undo
+                if  choice == 'q': #end game
+                    print("Game ended")
+                    #print(grid)
+                    go = False
+
+                if go:
+                    if choice == 'b': #go back
+                        goBack = int(input("Enter number of times to go back "))
+                        if goBack>len(allplayer2moves): #cant go back that many moves
+                            print('Invalid choice, keep playing')
+                        else: 
+                            for x in range(goBack): #make the last move empty
+                                grid = mark(grid,'',allplayer1moves[-1]) 
+                                grid = mark(grid,'',allplayer2moves[-1])
+                                allplayer1moves.pop() #then delete the move from the memory 
+                                allplayer2moves.pop()
+                        #print(allplayer1moves)
+                        #print(allplayer2moves)
+                            printGrid(grid) #show new grid after going back moves
  
