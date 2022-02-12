@@ -683,21 +683,33 @@ def bot_threaten_2_lines_poi(grid,cube_data): #check if bot can threat two wins
     [boo,coordinate]
     """
     #recall cube_data is taken in bot's perspective, where 1 is bot and -1 is opponent (player)
-    bot_threat = False
-    coordinate = ''
+    bot_threat_data = []
+    triple_check = 0
+    while triple_check<3:
+        bot_threat = False
+        coordinate = ''
+        bot_threat_potential = [bot_threat, coordinate]
 
-    bot_lines = []
-    for group in cube_data: #group of lines
-        for line in group: #each line in that group
-            count = count_moves_on_line(line)
-            if count[0]==2 and count[1]==0: #bot has 2 on this line and opponent has none
-                bot_lines.append(line)
+        bot_lines = []
+        for group in cube_data: #group of lines
+            for line in group: #each line in that group
+                count = count_moves_on_line(line)
+                if count[0]==2 and count[1]==0: #bot has 2 on this line and opponent has none
+                    bot_lines.append(line)
 
-    poi_boo_coordinate = compare_list_of_lines(grid,bot_lines) 
-    if poi_boo_coordinate[0]:
-        bot_threat = True
-        coordinate = poi_boo_coordinate[1]
-    return [bot_threat,coordinate]
+        poi_boo_coordinate = compare_list_of_lines(grid,bot_lines) 
+        if poi_boo_coordinate[0]:
+            bot_threat = True
+            coordinate = poi_boo_coordinate[1]
+        
+        bot_threat_potential = [bot_threat, coordinate]
+        bot_threat_data.append(bot_threat_potential)
+        triple_check+=1
+    
+    if bot_threat_data[0] == bot_threat_data[1] and bot_threat_data[1]==bot_threat_data[2] and bot_threat_data[0][0]==True:
+        return bot_threat_data[0]
+    else:
+        return [False,'']
 
 def bot_set_up_2_lines(grid,cube_data,debug=False):
     """
@@ -705,44 +717,58 @@ def bot_set_up_2_lines(grid,cube_data,debug=False):
     return true if can set up 2 lines and coordinate
     else false, ''
     """
-    set_up = False
-    coordinate = ''
-    bot_lines_with_2 = []
-    bot_lines_with_1 = []
-    #collect lines with 2 moves on them
-    for group in cube_data: #group of lines
-        for line in group: #each line in that group
-            count = count_moves_on_line(line)
-            if count[0]==2 and count[1]==0: #bot has 2 on this line and opponent has none
-                bot_lines_with_2.append(line)
+    set_up_data = []
 
-    #collect lines with 1 moves on them
-    for group in cube_data: #group of lines
-        for line in group: #each line in that group
-            count = count_moves_on_line(line)
-            if count[0]==1 and count[1]==0: #bot has 1 on this line and opponent has none
-                bot_lines_with_1.append(line)
+    triple_check = 0
+    while triple_check<3:
+        set_up = False #initialize
+        coordinate = '' #initialize
+        set_up_point = [set_up,coordinate] #initialize
 
-    lines_found= False
-    if not lines_found:
-        for line_with_1 in bot_lines_with_1: #compare each line (with 1) from list to every line (with 2) in other list
-            poi_boo_coordinate = compare_one_line_with_list_of_lines(grid,bot_lines_with_2,line_with_1) 
-            if poi_boo_coordinate[0]: #lines intersect and poi availible
-                set_up = True
-                
-                if debug:
-                    print("set up line with 1 " , line_with_1)
-                    print("set up line with 2 " , poi_boo_coordinate[2])
-                    print("lines intersect at " , poi_boo_coordinate[1])
-                
-                coordinate = empty_move2(line_with_1,poi_boo_coordinate[1])
-                if debug:
-                    print("the move that is on the line with 1 and IS NOT poi: " , coordinate)
+        bot_lines_with_2 = []
+        bot_lines_with_1 = []
+        #collect lines with 2 moves on them
+        for group in cube_data: #group of lines
+            for line in group: #each line in that group
+                count = count_moves_on_line(line)
+                if count[0]==2 and count[1]==0: #bot has 2 on this line and opponent has none
+                    bot_lines_with_2.append(line)
 
-                if set_up: #first set of intersecting lines
-                    lines_found = True
+        #collect lines with 1 moves on them
+        for group in cube_data: #group of lines
+            for line in group: #each line in that group
+                count = count_moves_on_line(line)
+                if count[0]==1 and count[1]==0: #bot has 1 on this line and opponent has none
+                    bot_lines_with_1.append(line)
+
+        lines_found= False
+        if not lines_found:
+            for line_with_1 in bot_lines_with_1: #compare each line (with 1) from list to every line (with 2) in other list
+                poi_boo_coordinate = compare_one_line_with_list_of_lines(grid,bot_lines_with_2,line_with_1) 
+                if poi_boo_coordinate[0]: #lines intersect and poi availible
+                    set_up = True
+                    
+                    if debug:
+                        print("set up line with 1 " , line_with_1)
+                        print("set up line with 2 " , poi_boo_coordinate[2])
+                        print("lines intersect at " , poi_boo_coordinate[1])
+                    
+                    coordinate = empty_move2(line_with_1,poi_boo_coordinate[1])
+                    if debug:
+                        print("the move that is on the line with 1 and IS NOT poi: " , coordinate)
+
+                    if set_up: #first set of intersecting lines
+                        lines_found = True
+
+        set_up_point = [set_up,coordinate]
+        set_up_data.append(set_up_point) #add to all set ups
+        triple_check+=1
     
-    return [set_up,coordinate]
+    if set_up_data[0] == set_up_data[1] and set_up_data[2] == set_up_data[1] and set_up_data[0][0] !=False: #triple check they are all the same
+        print("Passed triple check ")
+        return set_up_data[0] #they are all the same so
+    else:
+        return [False, ''] #no set up
 
 
 #______________________________________________________________________________________
@@ -793,7 +819,7 @@ def bot_decide_move(grid,bot_symbol,opponent_symbol):
             print(bot_symbol , " moved to immediate threat")
             bot_move = change_coordinates(bot_2_in_line[1])
 
-        bot_set_up = bot_set_up_2_lines(grid,cube_data) #even better, set up to threaten in two ways
+        bot_set_up = bot_set_up_2_lines(grid,cube_data,True) #even better, set up to threaten in two ways
         if bot_set_up[0]: 
             print(bot_symbol , " moved to set up")
             #print("bot move before change: " , bot_move)
